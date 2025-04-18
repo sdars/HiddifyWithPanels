@@ -22,10 +22,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # 使用最新的 v3 版本
 
     - name: Set up Flutter
-      uses: subosito/flutter-action@v2
+      uses: subosito/flutter-action@v3  # 使用最新的 v3 版本
       with:
         flutter-version: 'stable'
 
@@ -50,7 +50,7 @@ jobs:
         fi
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3  # 使用 v3 版本
       with:
         name: build-${{ matrix.platform }}
         path: |
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # 使用最新的 v3 版本
 
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1

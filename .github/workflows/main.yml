@@ -1,0 +1,77 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main  # 在 main 分支推送时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 你可以根据需要选择不同的操作系统，如 ubuntu-latest, macos-latest, windows-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: macos
+          - os: windows-latest
+            platform: windows
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: 'stable'
+
+    - name: Install dependencies for ${{ matrix.platform }}
+      run: |
+        if [ "${{ matrix.platform }}" == "linux" ]; then
+          make linux-prepare
+        elif [ "${{ matrix.platform }}" == "macos" ]; then
+          make macos-prepare
+        elif [ "${{ matrix.platform }}" == "windows" ]; then
+          make windows-prepare
+        fi
+
+    - name: Build Flutter project for ${{ matrix.platform }}
+      run: |
+        if [ "${{ matrix.platform }}" == "linux" ]; then
+          flutter build linux
+        elif [ "${{ matrix.platform }}" == "macos" ]; then
+          flutter build macos
+        elif [ "${{ matrix.platform }}" == "windows" ]; then
+          flutter build windows
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-${{ matrix.platform }}
+        path: |
+          build/${{ matrix.platform }}/*.apk
+          build/${{ matrix.platform }}/*.app
+          build/${{ matrix.platform }}/*.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: |
+          build/linux/*.deb
+          build/windows/*.exe
+          build/macOS/*.dmg
+          build/android/*.apk

@@ -71,7 +71,9 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          build/linux/*.deb
+          build/linux/*.apk
+          build/macOS/*.app
           build/windows/*.exe
+          build/linux/*.deb
           build/macOS/*.dmg
-          build/android/*.apk
+          build/windows/*.zip
